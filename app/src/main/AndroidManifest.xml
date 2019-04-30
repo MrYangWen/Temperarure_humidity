@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.mcz.temperarure_humidity_appproject">
+
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <!-- 相机 -->
+    <uses-permission android:name="android.permission.CAMERA" />
+    <!-- 灯光 -->
+    <uses-permission android:name="android.permission.FLASHLIGHT" />
+    <!-- 震动 -->
+    <uses-permission android:name="android.permission.VIBRATE" />
+
+    <uses-feature android:name="android.hardware.camera.autofocus" /> <!-- 自动聚焦权限 -->
+    <application
+        android:allowBackup="true"
+        android:icon="@drawable/iotclub"
+        android:label="@string/app_name"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme">
+        <activity android:name="com.mcz.temperarure_humidity_appproject.app.ui.activity.WelcomeActivity" />
+        <activity android:name="com.mcz.temperarure_humidity_appproject.app.ui.activity.LoginActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+        </activity>
+        <activity android:name="com.mcz.temperarure_humidity_appproject.MainActivity" />
+        <activity android:name="com.mcz.temperarure_humidity_appproject.app.ui.activity.InputManualActivity" />
+
+        <activity android:name="com.mcz.temperarure_humidity_appproject.app.ui.activity.InputCodeActivity" />
+        <activity android:name="com.mcz.temperarure_humidity_appproject.app.HistoricaldataActivity"/>
+        <activity android:name="com.mcz.temperarure_humidity_appproject.app.ui.zxing.zxing.new_CaptureActivity"/>
+    </application>
+
+</manifest>
