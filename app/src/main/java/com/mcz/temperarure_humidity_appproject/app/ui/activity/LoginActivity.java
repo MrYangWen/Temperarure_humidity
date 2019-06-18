@@ -25,6 +25,7 @@ import com.mcz.temperarure_humidity_appproject.R;
 import com.mcz.temperarure_humidity_appproject.app.ui.base.LoginBaseActivity;
 import com.mcz.temperarure_humidity_appproject.app.utils.Config;
 import com.mcz.temperarure_humidity_appproject.app.utils.DataManager;
+import com.mcz.temperarure_humidity_appproject.app.utils.NetDefult;
 import com.mcz.temperarure_humidity_appproject.app.utils.WaitDialogUtil;
 
 import org.json.JSONObject;
@@ -131,11 +132,15 @@ public class LoginActivity extends LoginBaseActivity {
 
     private void init() {
         // 电信
-        String usname = sp.getString("appId", "pi_bJ7aIZfRclA1kup67OgC1V4Aa");
-        String uspwd = sp.getString("userpwd", "i7ACx3urpsogefxeaUfpLYfyG1Aa");
-        String usaddress = sp.getString("seraddress", "180.101.147.89");
+        String usname = sp.getString("appId", "0kjvV5MCmsvxdJsuKey8zfxOYT0a");
+        String uspwd = sp.getString("userpwd", "YH9wZbbErSmefcNFgiBDon43gfca");
+        String usaddress = sp.getString("seraddress", "device.api.ct10649.com");
         String usport = sp.getString("post", "8743");
 
+        usname = NetDefult.getInstance().getAPPID();
+        uspwd = NetDefult.getInstance().getAPPPWD();
+        usaddress = NetDefult.getInstance().getIp();
+        usport = NetDefult.getInstance().getPORT();
         //华为
 //        String usname = sp.getString("appId", "bd323c55-f6d9-4791-8cc5-e29e9f0d15d9");
 //        String uspwd = sp.getString("userpwd", "f7a402dd5ce54acb615f");
@@ -144,7 +149,7 @@ public class LoginActivity extends LoginBaseActivity {
 
         if (!usaddress.equals("")) {
             edServiceAddress.setText(usaddress);
-            edServiceAddress.setSelection(usaddress.length());
+            //edServiceAddress.setSelection(usaddress.length());
         }
         if (!usname.equals("")) {
             edt_port.setText(usport);

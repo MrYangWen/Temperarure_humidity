@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.AssetFileDescriptor;
+import android.database.Cursor;
 import android.graphics.drawable.BitmapDrawable;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
@@ -24,6 +25,7 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.gyf.barlibrary.ImmersionBar;
@@ -32,8 +34,10 @@ import com.mcz.temperarure_humidity_appproject.app.model.PullrefreshListviewAdap
 //import com.mcz.Temperarure_humidity_appproject.app.ui.activity.HistoryActivity;
 import com.mcz.temperarure_humidity_appproject.app.ui.activity.InputManualActivity;
 import com.mcz.temperarure_humidity_appproject.app.ui.zxing.zxing.new_CaptureActivity;
+import com.mcz.temperarure_humidity_appproject.app.utils.BDhelper;
 import com.mcz.temperarure_humidity_appproject.app.utils.Config;
 import com.mcz.temperarure_humidity_appproject.app.utils.DataManager;
+import com.mcz.temperarure_humidity_appproject.app.utils.NetDefult;
 import com.mcz.temperarure_humidity_appproject.app.view.view.IPullToRefresh;
 import com.mcz.temperarure_humidity_appproject.app.view.view.LoadingLayout;
 import com.mcz.temperarure_humidity_appproject.app.view.view.PullToRefreshBase;
@@ -58,6 +62,8 @@ public class MainActivity extends AppCompatActivity {
     String datajson = "";
     @BindView(R.id.edt_dvid_search)
     EditText edtDvidSearch;
+    @BindView(R.id.main_nometer)
+    TextView nometer;
     @BindView(R.id.search_delete)
     ImageView searchDelete;
     @BindView(R.id.img_srearch)
@@ -81,6 +87,9 @@ public class MainActivity extends AppCompatActivity {
     private List<DataInfo> mlist = null;
 
     boolean type_choose = true;
+    BDhelper bd;
+    Cursor cursor;
+    ArrayList<String> bhs = new ArrayList<String>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -94,6 +103,15 @@ public class MainActivity extends AppCompatActivity {
         sp = PreferenceManager.getDefaultSharedPreferences(this);
         init();
         mListView = (PullToRefreshListView) findViewById(R.id.main_pull_refresh_lv);
+        //this.deleteDatabase( "homaywater" );
+        bd = new BDhelper( this,"homaywater");
+        cursor = bd.getReadableDatabase().query("homaytable", null, null, null,null, null, null);
+        if(cursor.getCount() > 0){
+            while(cursor.moveToNext()){
+                bhs.add(cursor.getString(cursor.getColumnIndex("qbbh")));
+            }
+        }
+        cursor.close();bd.close();
     }
 
     int item_position = 0;
@@ -225,16 +243,23 @@ public class MainActivity extends AppCompatActivity {
                     dataInfo.setDevicehumidity("0.00");
                     mlist.add(dataInfo);
                 } // 获取指定表的抄表量
-                else if (bh.equals("24971903000099") || bh.equals("24971904250001")) {
-                    dataInfo.setDeviceId(jsonArray.getJSONObject(i).optString("deviceId"));
-                    dataInfo.setGatewayId(jsonArray.getJSONObject(i).optString("gatewayId"));
-                    dataInfo.setLasttime(jsonArray.getJSONObject(i).optString("lastModifiedTime"));
-                    JSONObject object = new JSONObject(deviceinfo);
-                    dataInfo.setDeviceName(object.optString("name"));
-                    dataInfo.setDeviceStatus(object.optString("status"));
-                    dataInfo.setDevicetemperature("暂无数据");
-                    dataInfo.setDevicehumidity("暂无数据");
-                    mlist.add(dataInfo);
+                else if (!NetDefult.getInstance().getMetersize(this.getApplicationContext())) {
+                    for(int j=0;j<bhs.size();j++){
+                        if(bhs.get( j ).equals( bh )){
+                            dataInfo.setDeviceId(jsonArray.getJSONObject(i).optString("deviceId"));
+                            dataInfo.setGatewayId(jsonArray.getJSONObject(i).optString("gatewayId"));
+                            dataInfo.setLasttime(jsonArray.getJSONObject(i).optString("lastModifiedTime"));
+                            JSONObject object = new JSONObject(deviceinfo);
+                            dataInfo.setDeviceName(object.optString("name"));
+                            dataInfo.setDeviceStatus(object.optString("status"));
+                            dataInfo.setDevicetemperature("暂无数据");
+                            dataInfo.setDevicehumidity("暂无数据");
+                            mlist.add(dataInfo);
+                        }
+                    }
+
+                }else if (NetDefult.getInstance().getMetersize(this.getApplicationContext())) {
+                    nometer.setText( "请添加表号" );
                 }
             }
         } catch (Exception e) {

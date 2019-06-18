@@ -54,6 +54,7 @@
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
             android:layout_marginTop="10dp"
+            android:visibility="gone"
             android:background="@drawable/list_allshow_item_bg"
         >
             <TextView
@@ -90,6 +91,7 @@
             android:layout_height="80dp"
             android:orientation="vertical"
             android:layout_marginLeft="10dp"
+            android:visibility="gone"
             android:layout_marginRight="10dp"
             android:layout_marginTop="10dp"
             android:background="@drawable/list_allshow_item_bg"
@@ -167,21 +169,35 @@
                 </EditText>
             </LinearLayout>
         </LinearLayout>
+
         <Button
             android:id="@+id/btn_manual_input"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:layout_marginLeft="20dp"
-            android:layout_marginRight="20dp"
-            android:text="下一步"
-            android:textSize="18sp"
-            android:textColor="#fff"
             android:layout_gravity="center_horizontal"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginRight="20dp"
             android:background="@drawable/change_bg_btn"
+            android:text="添加"
+            android:textColor="#fff"
+            android:textSize="18sp"
 
-        />
+            />
+        <Button
+            android:id="@+id/btn_manual_delete"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginRight="20dp"
+            android:background="@drawable/change_bg_btn"
+            android:text="清空表号"
+            android:textColor="#fff"
+            android:textSize="18sp"
 
+            />
 
         <TextView
             android:visibility="gone"
