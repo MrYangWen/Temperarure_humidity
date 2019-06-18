@@ -243,9 +243,7 @@ public class MainActivity extends AppCompatActivity {
                     dataInfo.setDevicehumidity("0.00");
                     mlist.add(dataInfo);
                 } // 获取指定表的抄表量
-                else if (!NetDefult.getInstance().getMetersize(this.getApplicationContext())) {
-                    for(int j=0;j<bhs.size();j++){
-                        if(bhs.get( j ).equals( bh )){
+                else{
                             dataInfo.setDeviceId(jsonArray.getJSONObject(i).optString("deviceId"));
                             dataInfo.setGatewayId(jsonArray.getJSONObject(i).optString("gatewayId"));
                             dataInfo.setLasttime(jsonArray.getJSONObject(i).optString("lastModifiedTime"));
@@ -255,12 +253,7 @@ public class MainActivity extends AppCompatActivity {
                             dataInfo.setDevicetemperature("暂无数据");
                             dataInfo.setDevicehumidity("暂无数据");
                             mlist.add(dataInfo);
-                        }
                     }
-
-                }else if (NetDefult.getInstance().getMetersize(this.getApplicationContext())) {
-                    nometer.setText( "请添加表号" );
-                }
             }
         } catch (Exception e) {
             e.printStackTrace();
