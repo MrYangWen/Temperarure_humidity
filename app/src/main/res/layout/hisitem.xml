@@ -21,7 +21,7 @@
                 android:layout_marginLeft="10dp"
                 android:layout_marginRight="10dp"
                 android:layout_weight="1.8"
-                android:text="最后操作时间：" />
+                android:text="抄表时间：" />
 
             <TextView
                 android:id="@+id/timestamp"

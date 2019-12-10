@@ -28,11 +28,14 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.gyf.barlibrary.ImmersionBar;
 import com.mcz.temperarure_humidity_appproject.app.model.DataInfo;
 import com.mcz.temperarure_humidity_appproject.app.model.PullrefreshListviewAdapter;
 //import com.mcz.Temperarure_humidity_appproject.app.ui.activity.HistoryActivity;
 import com.mcz.temperarure_humidity_appproject.app.ui.activity.InputManualActivity;
+import com.mcz.temperarure_humidity_appproject.app.ui.zxing.zxing.HttpUtil;
 import com.mcz.temperarure_humidity_appproject.app.ui.zxing.zxing.new_CaptureActivity;
 import com.mcz.temperarure_humidity_appproject.app.utils.BDhelper;
 import com.mcz.temperarure_humidity_appproject.app.utils.Config;
@@ -45,8 +48,6 @@ import com.mcz.temperarure_humidity_appproject.app.view.view.PullToRefreshFooter
 import com.mcz.temperarure_humidity_appproject.app.view.view.PullToRefreshHeader;
 import com.mcz.temperarure_humidity_appproject.app.view.view.PullToRefreshListView;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -58,6 +59,7 @@ import butterknife.ButterKnife;
 
 public class MainActivity extends AppCompatActivity {
 
+    private static Context context;
     public final static int POSITION_INPUTMANUAL = 100;
     String datajson = "";
     @BindView(R.id.edt_dvid_search)
@@ -88,12 +90,15 @@ public class MainActivity extends AppCompatActivity {
 
     boolean type_choose = true;
     BDhelper bd;
+    HttpUtil hu;
     Cursor cursor;
     ArrayList<String> bhs = new ArrayList<String>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        hu = new HttpUtil();
         super.onCreate(savedInstanceState);
+        context=getApplicationContext();
         setContentView(R.layout.main_activity_layout);//开始运行main_activity_layout界面
         ButterKnife.bind(this);
         ImmersionBar.with(this)
@@ -148,12 +153,9 @@ public class MainActivity extends AppCompatActivity {
         imgSrearch.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                refreshButtonClicked();
                 if (!edtDvidSearch.getText().toString().trim().equals("")) {
-                    adapter.clearItem();
-                    mlist = new ArrayList<DataInfo>();
-                    datajson = edtDvidSearch.getText().toString().trim();
-                    new LoadDataAsyncTask(true, true).execute();
-                    hintKbTwo();
+                    refreshButtonClicked();
                 } else {
                     new LoadDataAsyncTask(true, false).execute();//查询所有
                     hintKbTwo();
@@ -193,6 +195,17 @@ public class MainActivity extends AppCompatActivity {
                 //填充数据
                 new LoadDataAsyncTask(headerOrFooter, false).execute();
             }
+
+            @Override
+            public void onPullDownToRefresh(PullToRefreshBase<ListView> refreshView) {
+
+                Toast.makeText(getApplicationContext(),"下拉刷新",Toast.LENGTH_LONG);
+            }
+
+            @Override
+            public void onPullUpToRefresh(PullToRefreshBase<ListView> refreshView) {
+                Toast.makeText(getApplicationContext(),"上拉刷新",Toast.LENGTH_LONG);
+            }
         });
 
         adapter = new PullrefreshListviewAdapter(this);
@@ -211,52 +224,82 @@ public class MainActivity extends AppCompatActivity {
      * @return
      */
     private List<DataInfo> ListviewADD_Data(int Fnum, int Onum) {
-        try {
-            String add_url = Config.all_url + "/iocm/app/dm/v1.3.0/devices?appId=" + login_appid
-                    + "&pageNo=" + Fnum + "&pageSize=" + Onum;
-            String json = DataManager.Txt_REQUSET(MainActivity.this, add_url, login_appid, token);
-            mlist = new ArrayList<DataInfo>();
+        String qbbh = edtDvidSearch.getText().toString().trim();
+        if(!qbbh.equals("")){
+            try {
+                mlist = new ArrayList<DataInfo>();
+                String json = hu.getHistory(qbbh);
+                new HttpUtil().getHistory(qbbh);
+                Thread.sleep(1000);
+                JSONArray jsonArray = new JSONArray();
+                jsonArray = JSONArray.parseArray(json);
+                Log.i("bbbbbbbbbbbbbbbbbbbbbbb", "test***********************" + json);
 
-            JSONObject jo = new JSONObject(json);
-            JSONArray jsonArray = jo.getJSONArray("devices");
-            Log.e("test", "" + jsonArray);
-            for (int i = 0; i < jsonArray.length(); i++) {
-                DataInfo dataInfo = new DataInfo();
-                String deviceinfo = jsonArray.getJSONObject(i).getString("deviceInfo");
-                JSONObject object1 = new JSONObject(deviceinfo);
-                String bh = object1.optString("name").substring(0, 14);
-                if (false) {
-                    JSONArray jsa = new JSONArray(deviceinfo);
-                    for (int j = 0; j < jsa.length(); j++) {
-                        String ser_data = jsa.getJSONObject(j).getString("data");
-                        JSONObject jsonObject = new JSONObject(ser_data);
-                        dataInfo.setDevicehumidity(jsonObject.optString("M2s"));
-                        dataInfo.setDevicehumidity(jsonObject.optString("S2m"));
-                    }
-                    dataInfo.setDeviceId(jsonArray.getJSONObject(i).optString("deviceId"));
-                    dataInfo.setGatewayId(jsonArray.getJSONObject(i).optString("gatewayId"));
-                    dataInfo.setLasttime(jsonArray.getJSONObject(i).optString("lastModifiedTime"));
-                    JSONObject object = new JSONObject(deviceinfo);
-                    dataInfo.setDeviceName(object.optString("name"));
-                    dataInfo.setDeviceStatus(object.optString("status"));
-                    dataInfo.setDevicetemperature("0.00");
-                    dataInfo.setDevicehumidity("0.00");
-                    mlist.add(dataInfo);
-                } // 获取指定表的抄表量
-                else{
+                /*String add_url = Config.all_url + "/iocm/app/dm/v1.3.0/devices?appId=" + login_appid
+                        + "&pageNo=" + Fnum + "&pageSize=" + Onum;
+                //String add_url = Config.all_url + "/iocm/app/dm/v1.3.0/devices/" + "d8811b05-5fbe-4d55-8041-21a0f11fe7b7" + "?appId=" + login_appid;
+                String json = DataManager.Txt_REQUSET(MainActivity.this, add_url, login_appid, token);
+                mlist = new ArrayList<DataInfo>();
+
+                JSONObject jo = new JSONObject(json);
+                JSONArray jsonArray = jo.getJSONArray("devices");
+                Log.e("test", "" + jsonArray);*/
+                //for (int i = 0; i < jsonArray.length(); i++) {
+                    DataInfo dataInfo = new DataInfo();
+                JSONObject info = new JSONObject();
+                info = jsonArray.getJSONObject(0);
+                    /*String deviceinfo = jsonArray.getJSONObject(0);
+                    JSONObject object1 = new JSONObject(deviceinfo);
+                    String bh = object1.optString("name").substring(0, 14);*/
+                        /*if (false) {
+                            JSONArray jsa = new JSONArray(deviceinfo);
+                            for (int j = 0; j < jsa.length(); j++) {
+                                String ser_data = jsa.getJSONObject(j).getString("data");
+                                JSONObject jsonObject = new JSONObject(ser_data);
+                                dataInfo.setDevicehumidity(jsonObject.optString("M2s"));
+                                dataInfo.setDevicehumidity(jsonObject.optString("S2m"));
+                            }
                             dataInfo.setDeviceId(jsonArray.getJSONObject(i).optString("deviceId"));
                             dataInfo.setGatewayId(jsonArray.getJSONObject(i).optString("gatewayId"));
                             dataInfo.setLasttime(jsonArray.getJSONObject(i).optString("lastModifiedTime"));
                             JSONObject object = new JSONObject(deviceinfo);
                             dataInfo.setDeviceName(object.optString("name"));
                             dataInfo.setDeviceStatus(object.optString("status"));
-                            dataInfo.setDevicetemperature("暂无数据");
-                            dataInfo.setDevicehumidity("暂无数据");
+                            dataInfo.setDevicetemperature("0.00");
+                            dataInfo.setDevicehumidity("0.00");
                             mlist.add(dataInfo);
-                    }
+                        } // 获取指定表的抄表量
+                        else{*/
+                            dataInfo.setDeviceId(info.getString("deviceId"));
+                           // dataInfo.setGatewayId(jsonArray.getJSONObject(i).optString("gatewayId"));
+                            //dataInfo.setLasttime(info.getString("xcsj"));
+                           // JSONObject object = new JSONObject(deviceinfo);
+                            dataInfo.setDeviceName(info.getString("qbbh"));
+                            String add_url = Config.all_url + "/iocm/app/dm/v1.3.0/devices/" + info.getString("deviceId") + "?appId=" + login_appid;
+                            String devid = DataManager.Txt_REQUSET(MainActivity.this, add_url, login_appid, token);
+                            Log.i("bbbbbbbbbbbbbbbbbbbbbbb", "//////////////////////////////" + devid);
+                            /*JSONArray devjson = new JSONArray();
+                            devjson = JSONArray.parseArray(devid);*/
+                            org.json.JSONObject jo = new org.json.JSONObject(devid);
+                            String deviceinfo = jo.optString("deviceInfo");
+                            dataInfo.setLasttime(jo.optString("lastModifiedTime"));
+                            org.json.JSONObject object = new org.json.JSONObject(deviceinfo);
+
+                            dataInfo.setDeviceStatus(object.optString("status"));
+                       /* String json1 = "";
+                        JSONObject jo1 = new JSONObject();
+                        String add_url1 = "https://222.180.163.205:8045/homay-nbiot-api/api/nbiot/datacollection/list?protocolCode=" + bh;
+                        HttpUtil hu = new HttpUtil();
+                        json1 = hu.getHistory(bh);
+                        jo1 = new JSONObject(json1);*/
+                            dataInfo.setDevicetemperature(info.getString("qbll"));
+                            dataInfo.setDevicehumidity(info.getString("freeQbll"));
+                            mlist.add(dataInfo);
+                        //}
+                //}
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-        } catch (Exception e) {
-            e.printStackTrace();
         }
         return mlist;
     }
@@ -310,7 +353,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    private List<DataInfo> Listview_Inputmanual(String dvid) {
+    /*private List<DataInfo> Listview_Inputmanual(String dvid) {
         try {
             // https://server:port/iocm/app/dm/v1.3.0/devices/{deviceId}?appId={appId}
             String login_appid = sp.getString("appId", "");
@@ -353,11 +396,11 @@ public class MainActivity extends AppCompatActivity {
             }
         } catch (Exception e) {
             Toast.makeText(this, "请输入正确的设备ID", Toast.LENGTH_SHORT).show();
-            rela_nodata.setVisibility(View.VISIBLE);
+            //rela_nodata.setVisibility(View.VISIBLE);
             e.printStackTrace();
         }
         return mlist;
-    }
+    }*/
 
     public void setBackgroundAlpha(float bgAlpha) {
         WindowManager.LayoutParams lp = getWindow()
@@ -378,6 +421,7 @@ public class MainActivity extends AppCompatActivity {
         private boolean is_Add;
 
         public LoadDataAsyncTask(boolean headerOrFooter, boolean isadd) {
+            adapter.clearItem();
             mHeaderOrFooter = headerOrFooter;
             is_Add = isadd;
         }
@@ -397,7 +441,6 @@ public class MainActivity extends AppCompatActivity {
                 return null;
             }
             List<DataInfo> result = null;
-
             try {
                 //首先判断是否查询所有还是单个
                 if (!is_Add) {
@@ -428,7 +471,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                 } else {
                     //更据ID查询
-                    result = Listview_Inputmanual(datajson);
+                    result = ListviewADD_Data(0,5);
                 }
                 return result;
             } catch (Exception e) {
@@ -459,7 +502,7 @@ public class MainActivity extends AppCompatActivity {
                 if (adapter.getCount() == 0 && result.size() == 0) {
                     mListView.setVisibility(View.GONE);
                     mListView.getRefreshableView().removeFooterView(mNoMoreView);
-                    rela_nodata.setVisibility(View.VISIBLE);
+                    //rela_nodata.setVisibility(View.VISIBLE);
                 } else if (result.size() > 5) {
                     if (result.size() % 5 == 0) {
                     } else {
@@ -479,7 +522,7 @@ public class MainActivity extends AppCompatActivity {
                 addlistdata(result);
                 adapter.notifyDataSetChanged();//刷新完成
             } else {
-                rela_nodata.setVisibility(View.VISIBLE);
+                //rela_nodata.setVisibility(View.VISIBLE);
                 Toast.makeText(MainActivity.this, "暂无设备信息", Toast.LENGTH_SHORT).show();
             }
         }
@@ -510,9 +553,9 @@ public class MainActivity extends AppCompatActivity {
                 return null;
             }
             List<DataInfo> result = null;
-
+            adapter.clearItem();
             try {
-                Thread.sleep(5000);
+                //Thread.sleep(5000);
                 //首先判断是否查询所有还是单个
                 if (!is_Add) {
                     if (mHeaderOrFooter && type_choose) {
@@ -542,7 +585,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                 } else {
                     //更据ID查询
-                    result = Listview_Inputmanual(datajson);
+                    result = ListviewADD_Data(0,100);
                 }
                 return result;
             } catch (Exception e) {
@@ -573,7 +616,7 @@ public class MainActivity extends AppCompatActivity {
                 if (adapter.getCount() == 0 && result.size() == 0) {
                     mListView.setVisibility(View.GONE);
                     mListView.getRefreshableView().removeFooterView(mNoMoreView);
-                    rela_nodata.setVisibility(View.VISIBLE);
+                    //rela_nodata.setVisibility(View.VISIBLE);
                 } else if (result.size() > 5) {
                     if (result.size() % 5 == 0) {
                     } else {
@@ -591,7 +634,7 @@ public class MainActivity extends AppCompatActivity {
                 addlistdata(result);
                 adapter.notifyDataSetChanged();//刷新完成
             } else {
-                rela_nodata.setVisibility(View.VISIBLE);
+                //rela_nodata.setVisibility(View.VISIBLE);
                 Toast.makeText(MainActivity.this, "暂无设备信息", Toast.LENGTH_SHORT).show();
             }
         }
@@ -714,4 +757,8 @@ public class MainActivity extends AppCompatActivity {
         return super.onKeyDown(keyCode, event);
     }
 
+
+    public static Context getContext() {
+        return context;
+    }
 }

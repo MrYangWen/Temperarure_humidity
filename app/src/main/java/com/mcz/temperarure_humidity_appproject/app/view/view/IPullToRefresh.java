@@ -2,6 +2,7 @@ package com.mcz.temperarure_humidity_appproject.app.view.view;
 
 import android.view.View;
 import android.view.animation.Interpolator;
+import android.widget.ListView;
 
 /**
  *
@@ -180,6 +181,9 @@ public interface IPullToRefresh <T extends View> {
          */
         public void onRefresh(final PullToRefreshBase<V> refreshView, boolean headerOrFooter);
 
+        void onPullDownToRefresh(PullToRefreshBase<ListView> refreshView);
+
+        void onPullUpToRefresh(PullToRefreshBase<ListView> refreshView);
     }
 
     /**

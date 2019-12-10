@@ -95,7 +95,7 @@ public class PullrefreshListviewAdapter2 extends BaseAdapter {
 
         vh.humidity.setText(info.getDevicehumidity());
         vh.temperature.setText(info.getDevicetemperature());//
-        vh.timestamp.setText(timestampToDateString(TIME));
+        vh.timestamp.setText(time);
         return convertView;
     }
 

@@ -1,9 +1,12 @@
 package com.mcz.temperarure_humidity_appproject.app.ui.zxing.zxing;
 
+import android.app.Activity;
+import android.content.Context;
 import android.util.Log;
 import android.widget.Toast;
 
 import com.mcz.temperarure_humidity_appproject.MainActivity;
+import com.mcz.temperarure_humidity_appproject.app.utils.DataManager;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -87,7 +90,6 @@ public class HttpUtil {
         new Thread(new Runnable() {
             @Override
             public void run() {
-
                 OkHttpClient.Builder okHttpClient =new OkHttpClient.Builder();
 
                 RequestBody requestBody=new FormBody.Builder()
@@ -95,10 +97,18 @@ public class HttpUtil {
                         .build();
 
                 Request request = new Request.Builder()
-                        .url("https://222.180.163.205:8045/homay-nbiot-api/api/nbiot/datacollection/list")
+                        .url("https://222.180.163.205:8046/homay-nbiot-api/api/nbiot/datacollection/list")
                         .post(requestBody)
                         .build();
                 HTTPSCerUtils.setTrustAllCertificate(okHttpClient);
+                /*Response  response= null;
+                try {
+                    response = okHttpClient.build().newCall(request).execute();
+                    result[0] = response.body().string();
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }*/
                 Call call = okHttpClient.build().newCall(request);
                 call.enqueue(new Callback() {
 
@@ -111,12 +121,43 @@ public class HttpUtil {
                     public void onResponse(Call call, Response response) throws IOException {
                         //Log.i("test","------------:"+response.body().string());
                         result[0] = response.body().string();
+                        Log.i("test",result[0]);
                     }
                 });
             }
         }).start();
-        Thread.sleep(500);
-        //Log.i("test","*********************:"+ result[0]);
+        Thread.sleep(2000);
+        Log.e("test","*******************************************"+result[0]);
         return result[0];
+                /*OkHttpClient.Builder okHttpClient =new OkHttpClient.Builder();
+
+                RequestBody requestBody=new FormBody.Builder()
+                        .add("protocolCode",qbbh)
+                        .build();
+
+                Request request = new Request.Builder()
+                        .url("https://222.180.163.205:8045/homay-nbiot-api/api/nbiot/datacollection/list")
+                        .post(requestBody)
+                        .build();
+                HTTPSCerUtils.setTrustAllCertificate(okHttpClient);
+                Response  response=  okHttpClient.build().newCall(request).execute();
+                String strBody =     response.body().string();*/
+
+                /*Call call = okHttpClient.build().newCall(request);
+                call.enqueue(new Callback() {
+
+                    @Override
+                    public void onFailure(Call call, IOException e) {
+                        Log.i("test","------------:"+e.toString());
+                    }
+
+                    @Override
+                    public void onResponse(Call call, Response response) throws IOException {
+                        //Log.i("test","------------:"+response.body().string());
+                        result[0] = response.body().string();
+                    }
+                });*/
+        //Thread.sleep(500);
+        //Log.i("test","*********************:"+ result[0]);
     }
 }

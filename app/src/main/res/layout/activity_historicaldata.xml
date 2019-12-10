@@ -7,7 +7,7 @@
     xmlns:ptr="http://schemas.android.com/apk/res-auto"
     tools:context="com.mcz.temperarure_humidity_appproject.app.HistoricaldataActivity">
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
@@ -49,6 +49,21 @@
                 android:textSize="25sp" />
         </RelativeLayout>
 
+        <Button
+            android:id="@+id/open"
+            android:text="开阀"
+            android:layout_width="100dp"
+            android:layout_marginTop="50dp"
+            android:layout_marginLeft="100dp"
+            android:layout_height="wrap_content"/>
+        <Button
+            android:id="@+id/close"
+            android:text="关阀"
+            android:layout_width="100dp"
+            android:layout_marginLeft="200dp"
+            android:layout_marginTop="50dp"
+            android:layout_height="wrap_content"/>
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -57,10 +72,10 @@
             <com.mcz.temperarure_humidity_appproject.app.view.view.PullToRefreshListView
                 android:id="@+id/main_pull_refresh_his"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="500dp"
                 android:layout_marginLeft="10dp"
+                android:layout_marginTop="100dp"
                 android:layout_marginRight="10dp"
-                android:layout_marginTop="10dp"
                 android:layout_weight="1"
                 android:cacheColorHint="#00000000"
                 android:descendantFocusability="blocksDescendants"
@@ -77,6 +92,6 @@
             </com.mcz.temperarure_humidity_appproject.app.view.view.PullToRefreshListView>
         </LinearLayout>
 
-    </LinearLayout>
+    </RelativeLayout>
 
 </android.support.constraint.ConstraintLayout>

@@ -1,5 +1,7 @@
 package com.mcz.temperarure_humidity_appproject.app;
 
+import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -7,23 +9,32 @@ import android.content.res.AssetFileDescriptor;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.AsyncTask;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import android.preference.PreferenceManager;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.View;
+import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
+import com.alibaba.fastjson.JSONArray;
 import com.gyf.barlibrary.ImmersionBar;
+import com.mcz.temperarure_humidity_appproject.MainActivity;
 import com.mcz.temperarure_humidity_appproject.R;
 import com.mcz.temperarure_humidity_appproject.app.model.DataInfo;
 import com.mcz.temperarure_humidity_appproject.app.model.PullrefreshListviewAdapter;
 import com.mcz.temperarure_humidity_appproject.app.model.PullrefreshListviewAdapter2;
+import com.mcz.temperarure_humidity_appproject.app.ui.zxing.zxing.HTTPSCerUtils;
 import com.mcz.temperarure_humidity_appproject.app.ui.zxing.zxing.HttpUtil;
 import com.mcz.temperarure_humidity_appproject.app.utils.Config;
 import com.mcz.temperarure_humidity_appproject.app.utils.DataManager;
@@ -34,16 +45,25 @@ import com.mcz.temperarure_humidity_appproject.app.view.view.PullToRefreshFooter
 import com.mcz.temperarure_humidity_appproject.app.view.view.PullToRefreshHeader;
 import com.mcz.temperarure_humidity_appproject.app.view.view.PullToRefreshListView;
 
-import org.json.JSONArray;
+
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.FormBody;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
 
 public class HistoricaldataActivity extends AppCompatActivity {
 
@@ -52,6 +72,8 @@ public class HistoricaldataActivity extends AppCompatActivity {
     String token2 = "";
     String login_appid = "";
     SharedPreferences sp2;
+    String qbbh = "";
+    HttpUtil hu;
     @BindView(R.id.main_pull_refresh_his)
     PullToRefreshListView mListView2;
 
@@ -60,6 +82,12 @@ public class HistoricaldataActivity extends AppCompatActivity {
 
     @BindView(R.id.img_histor)
     ImageView back;
+
+    @BindView(R.id.open)
+    Button opendoor;
+
+    @BindView(R.id.close)
+    Button closedoor;
 
     private View mNoMoreView2;
 
@@ -80,10 +108,12 @@ public class HistoricaldataActivity extends AppCompatActivity {
                 .fitsSystemWindows(true)
                 .init();
         sp2 = PreferenceManager.getDefaultSharedPreferences(this);
+        hu = new HttpUtil();
         login_appid = sp2.getString("appId", "");
         init();
         Intent intent = getIntent();
         deviceId = intent.getStringExtra("deviceId");
+        qbbh = intent.getStringExtra("qbbh");
         gatewayId = intent.getStringExtra("gatewayId");
         back.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -91,6 +121,21 @@ public class HistoricaldataActivity extends AppCompatActivity {
                 finish();
             }
         });
+
+        opendoor.setOnClickListener(new View.OnClickListener() { //添加开阀指令
+            @Override
+            public void onClick(View v) {
+                handler.obtainMessage(0).sendToTarget();
+            }
+        });
+
+        closedoor.setOnClickListener(new View.OnClickListener() { //添加关阀指令
+            @Override
+            public void onClick(View v) {
+                handler.obtainMessage(1).sendToTarget();
+            }
+        });
+
     }
 
     int item_position = 0;
@@ -138,6 +183,16 @@ public class HistoricaldataActivity extends AppCompatActivity {
 //                getList_AsyncTask(headerOrFooter);
                 new LoadDataAsyncTask2(headerOrFooter, false).execute();
             }
+
+            @Override
+            public void onPullDownToRefresh(PullToRefreshBase<ListView> refreshView) {
+
+            }
+
+            @Override
+            public void onPullUpToRefresh(PullToRefreshBase<ListView> refreshView) {
+
+            }
         });
         adapter2 = new PullrefreshListviewAdapter2(this);
         mListView2.getRefreshableView().addFooterView(mNoMoreView2);
@@ -158,36 +213,47 @@ public class HistoricaldataActivity extends AppCompatActivity {
 //            String add_url = Config.all_url + "/iocm/app/dm/v1.3.0/devices?appId=" + login_appid
 //                    + "&pageNo=" + Fnum + "&pageSize=" + Onum;
             ////////////////////////////////////////////************************查询设备历史数据*****************/////////////////////////////////////
-            String add_url = Config.all_url + "/iocm/app/data/v1.1.0/deviceDataHistory?deviceId=" + deviceId + "&gatewayId=" + gatewayId;
-            String json = DataManager.Txt_REQUSET(HistoricaldataActivity.this, add_url, login_appid, token2);
+            //String add_url = Config.all_url + "/iocm/app/data/v1.1.0/deviceDataHistory?deviceId=" + deviceId + "&gatewayId=" + gatewayId;
+            String json = hu.getHistory(qbbh);
+            JSONArray joa = new JSONArray();
+            joa = JSONArray.parseArray(json);
             Log.i("bbbbbbbbbbbbbbbbbbbbbbb", "josn1" + json);
             mlist2 = new ArrayList<DataInfo>();
-            JSONObject jo = new JSONObject(json);
-            JSONArray jsonArray = jo.getJSONArray("deviceDataHistoryDTOs");
-
-            for (int i = 0; i < jsonArray.length(); i++) {
+            //JSONObject jo = new JSONObject();
+            /*JSONArray jsonArray = jo.getJSONArray("deviceDataHistoryDTOs");*/
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            DecimalFormat decimalFormat=new DecimalFormat("0.000");
+            for (int i = 0; i < joa.size(); i++) {
                 DataInfo dataInfo = new DataInfo();
-                String timestamp = jsonArray.getJSONObject(i).getString("timestamp");
+
+                String time =  sdf.format(new Date(Long.valueOf(joa.getJSONObject(i).getString("xcsj"))));
+                String timestamp = time;
                 dataInfo.setDevicetimestamp(timestamp);
-                String ser_data = jsonArray.getJSONObject(i).getString("data");
+                //String ser_data = joa.getJSONObject(i).getString("data");
                 //   Log.i("bbbbbbbbbbbbbbbbbbbbbb","timestamp            "+timestamp);
 //                dataInfo.setDevicetimestamp(timestamp);
-                JSONObject jsonObject = new JSONObject(ser_data);
+                //JSONObject jsonObject = new JSONObject(ser_data);
 //                dataInfo.setDevicehumidity(jsonObject.optString("Humidity"));
 //                dataInfo.setDevicetemperature(jsonObject.optString("Temperature"));
-                HttpUtil hu = new HttpUtil();
-                String json1 = "";
-                JSONObject jo1 = new JSONObject();
+
+                //String json1 = "";
+                //JSONArray jo1 = new JSONArray();
 
                 try {
-                    json1 = hu.getHistory(jsonObject.optString("message").substring(14, 28));
-                    jo1 = new JSONObject(json1);
+                    /*json1 = hu.getHistory(jsonObject.optString("message").substring(14, 28));
+                    jo1 = new JSONObject(json1);*/
+
+                    //String add_url1 = "https://222.180.163.205:8045/homay-nbiot-api/api/nbiot/datacollection/list?protocolCode=" + jsonObject.optString("message").substring(14, 28);
+                    //json1 = hu.getHistory(jsonObject.optString("message").substring(14, 28));
+                    //jo1 = JSONArray.parseArray(json1);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-                dataInfo.setDevicehumidity(jo1.optString("freeQbll"));
-                dataInfo.setDevicetemperature(jo1.optString("qbll"));
-                dataInfo.setMessage(jsonObject.optString("message"));
+                dataInfo.setDevicetemperature(joa.getJSONObject(i).getString("qbll")+" m³");
+                String scds = joa.getJSONObject(i).getString("scds");
+                Float dayll = Float.parseFloat(joa.getJSONObject(i).getString("qbll")) - Float.parseFloat(scds);
+                dataInfo.setDevicehumidity(decimalFormat.format(dayll)+" m³");
+                dataInfo.setMessage(joa.getJSONObject(i).toString());
                 mlist2.add(dataInfo);
             }
         } catch (Exception e) {
@@ -415,18 +481,74 @@ public class HistoricaldataActivity extends AppCompatActivity {
         hintKbTwo();
     }
 
-    public String getHistory(String qbbh) {
+    @SuppressLint("HandlerLeak")
+    private Handler handler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
 
-        String json = "";
-        try {
-            sp2 = PreferenceManager.getDefaultSharedPreferences(this);
-            login_appid = sp2.getString("appId", "");
-            String add_url = "https://222.180.163.205:8045/homay-nbiot-api/api/nbiot/NbReadHistory/list";
-            json = DataManager.Txt_REQUSET(HistoricaldataActivity.this, add_url, login_appid, token2);
-            Log.i("test", "通过表号查询用量：" + json);
-        } catch (Exception e) {
-            Log.i("test", "通过表号查询用量错误：" + e.toString());
+            String instructions = "";
+            switch (msg.what){
+                case 0:
+                    instructions="3051";
+                    break;
+                case 1:
+                    instructions="3052";
+                    break;
+            }
+            if(instructions.equals("") || instructions == ""){
+                return;
+            }
+            OkHttpClient.Builder okHttpClient =new OkHttpClient.Builder();
+            Request request = new Request.Builder()
+                    .url("https://222.180.163.205:8046/homay-nbiot-api/api/nbiot/datacollection/"+instructions+"/"+qbbh)
+                    .get()
+                    .build();
+            HTTPSCerUtils.setTrustAllCertificate(okHttpClient);
+            Call call = okHttpClient.build().newCall(request);
+            final String finalInstructions = instructions;
+            call.enqueue(new okhttp3.Callback() {
+
+                @Override
+                public void onFailure(Call call, IOException e) {
+                    Log.i("test","------------:"+e.toString());
+                    Looper.prepare();
+                    Toast.makeText(HistoricaldataActivity.this,"网络请求失败",Toast.LENGTH_LONG).show();
+                    Looper.loop();
+                }
+                @Override
+                public void onResponse(Call call, Response response) throws IOException {
+                    //Log.i("test","------------:"+response.body().string());
+                    int code = response.code();
+                    if(code == 200){
+                        Looper.prepare();
+                        if(finalInstructions == "3051"){
+                            Toast.makeText(HistoricaldataActivity.this,"开阀指令添加成功",Toast.LENGTH_LONG).show();
+                        }else if(finalInstructions == "3052"){
+                            Toast.makeText(HistoricaldataActivity.this,"关阀指令添加成功",Toast.LENGTH_LONG).show();
+                        }
+                        Looper.loop();
+
+                        /*AlertDialog.Builder builder  = new AlertDialog.Builder(HistoricaldataActivity.this);
+                        builder.setTitle("消息" ) ;
+                        if(finalInstructions == "3051"){
+                            builder.setMessage("开阀指令添加成功" ) ;
+                        }else if(finalInstructions == "3052"){
+                            builder.setMessage("关阀指令添加成功" ) ;
+                        }
+                        builder.setPositiveButton("确定" ,  null );
+                        AlertDialog localAlertDialog = builder.create();
+                        //localAlertDialog.getWindow().setType(WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY);
+                        localAlertDialog.show();*/
+                    }else{
+                        Log.i("code","------------:"+code);
+                        Looper.prepare();
+                        Toast.makeText(HistoricaldataActivity.this,"指令添加失败："+code,Toast.LENGTH_LONG).show();
+                        Looper.loop();
+                    }
+                }
+            });
+            super.handleMessage(msg);
         }
-        return json;
-    }
+    };
+
 }

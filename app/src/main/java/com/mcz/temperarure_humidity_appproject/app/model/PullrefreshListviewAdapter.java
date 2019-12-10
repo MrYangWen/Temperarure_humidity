@@ -18,6 +18,7 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.alibaba.fastjson.JSONArray;
 import com.daimajia.swipe.SwipeLayout;
 import com.mcz.temperarure_humidity_appproject.MainActivity;
 import com.mcz.temperarure_humidity_appproject.R;
@@ -25,6 +26,7 @@ import com.mcz.temperarure_humidity_appproject.app.HistoricaldataActivity;
 import com.mcz.temperarure_humidity_appproject.app.ui.zxing.zxing.HttpUtil;
 import com.mcz.temperarure_humidity_appproject.app.utils.Config;
 import com.mcz.temperarure_humidity_appproject.app.utils.DataManager;
+
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -59,6 +61,8 @@ public class PullrefreshListviewAdapter extends BaseAdapter {
     private ViewHolder vh;
     HttpUtil hu;
     HistoricaldataActivity hda;
+    SharedPreferences sp2;
+    String token2 = "";
     public static final MediaType JSON1 = MediaType.parse("application/json; charset=utf-8");
 
     public  PullrefreshListviewAdapter( Context context){
@@ -97,8 +101,6 @@ public class PullrefreshListviewAdapter extends BaseAdapter {
     @Override
     public View getView(final int position, View convertView, ViewGroup parent) {
 
-
-
         if (convertView == null){
             convertView = LayoutInflater.from(mContext).inflate(R.layout.listview_item,parent,false);
             vh = new ViewHolder();
@@ -112,7 +114,7 @@ public class PullrefreshListviewAdapter extends BaseAdapter {
             vh = (ViewHolder) convertView.getTag();
         }
 
-        DataInfo info = getItem(position);
+        final DataInfo info = getItem(position);
         /*if(!info.getDeviceName().substring(0,14).equals("24971903000099") || !info.getDeviceName().substring(0,14).equals("24971904250001")){
             return convertView;
         }*/
@@ -134,27 +136,40 @@ public class PullrefreshListviewAdapter extends BaseAdapter {
 //                String deviceId = mlist.get(position).getDeviceId();
 //                String gatewayId = mlist.get(position).getGatewayId();
                 mIntent.putExtra("deviceId", deviceId.get(position));
+                mIntent.putExtra("qbbh", info.getDeviceName().substring(0,14));
                 mIntent.putExtra("gatewayId", gatewayId.get(position));
                 mContext.startActivity(mIntent);
 
             }
         });
+        vh.temperature.setText(info.getDevicetemperature());//info.getDevicetemperature()设置数据temperature
+        vh.tv_Devicehumidity.setText(info.getDevicehumidity());
         ///////////////////////////////////////////////////////////////////////////////////////////////
-        hda = new HistoricaldataActivity();
+        /*hda = new HistoricaldataActivity();
         hu = new HttpUtil();
         String json1 = "";
-        JSONObject jo = new JSONObject();
+        JSONArray jo = new JSONArray();
 
         try {
-            json1 =hu.getHistory(info.getDeviceName().substring(0,14));
-            jo = new JSONObject(json1);
+            String add_url1 = "https://222.180.163.205:8046/homay-nbiot-api/api/nbiot/datacollection/list?protocolCode=" + info.getDeviceName().substring(0,14);
+            json1 = hu.getHistory(info.getDeviceName().substring(0,14));
+            jo = JSONArray.parseArray(json1);
+
+            //JSONArray jsa = jo.getJSONArray();
         } catch (Exception e) {
             e.printStackTrace();
-        }
+        }*/
         //累计用量
-        vh.temperature.setText(jo.optString("qbll"));//info.getDevicetemperature()设置数据temperature
+        /*try {
+            if(null != jo) {
+                vh.temperature.setText(new JSONObject(jo.get(0).toString()).optString("qbll"));//info.getDevicetemperature()设置数据temperature
+                vh.tv_Devicehumidity.setText(new JSONObject(jo.get(0).toString()).optString("freeQbll"));
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }*/
         //日用量
-        vh.tv_Devicehumidity.setText(jo.optString("freeQbll"));
+
 
 
 
