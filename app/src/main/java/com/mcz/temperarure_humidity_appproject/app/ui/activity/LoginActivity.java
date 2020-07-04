@@ -18,6 +18,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.Toast;
 
 import com.mcz.temperarure_humidity_appproject.MainActivity;
@@ -67,6 +69,13 @@ public class LoginActivity extends LoginBaseActivity {
     EditText edt_port;
     @BindView(R.id.iv_clean_port)
     ImageView img_cleanport;
+
+    @BindView(R.id.btn8046)
+    RadioButton btn8046;
+    @BindView(R.id.btn8045)
+    RadioButton btn8045;
+    @BindView(R.id.chekport)
+    RadioGroup chekport;
 //    @BindView(R.id.btn_start_sy)
 //    Button btn_sy;
 
@@ -85,6 +94,22 @@ public class LoginActivity extends LoginBaseActivity {
         ButterKnife.bind(this);
         //设置沉浸式标题栏
         setStatusBar();
+        chekport.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup radioGroup, int i) {
+                if(btn8045.isChecked()){
+                    edServiceAddress.setText(NetDefult.getInstance().getIP8045());
+                    edt_port.setText(NetDefult.getInstance().getPORT8045());
+                    etUsername.setText(NetDefult.getInstance().getAPPID8045());
+                    etPassword.setText(NetDefult.getInstance().getAPPPWD8045());
+                }else{
+                    edServiceAddress.setText(NetDefult.getInstance().getIp());
+                    edt_port.setText(NetDefult.getInstance().getPORT());
+                    etUsername.setText(NetDefult.getInstance().getAPPID());
+                    etPassword.setText(NetDefult.getInstance().getAPPPWD());
+                }
+            }
+        });
         init();
     }
 
@@ -243,6 +268,7 @@ public class LoginActivity extends LoginBaseActivity {
 //                    https://218.4.33.71:8743/iocm/app/sec/v1.1.0/login
                     String json = DataManager.Login_Request(LoginActivity.this, url, user, pwd);
                     data.putString("json", json);
+
                 } catch (Exception e) {
                     data.putString("errmsg", e.getMessage());
                 }
@@ -275,6 +301,13 @@ public class LoginActivity extends LoginBaseActivity {
                 sp.edit().putString("userpwd", etPassword.getText().toString().trim()).commit();
                 sp.edit().putString("seraddress", edServiceAddress.getText().toString().trim()).commit();
                 sp.edit().putString("post", edt_port.getText().toString().trim()).commit();
+                if(btn8046.isChecked()){
+                    //PreHelper.defaultCenter().setData(PreferenceKey.BASE_PORT,"8046");
+                    sp.edit().putString("sport", "8046").commit();
+                }else{
+                    //PreHelper.defaultCenter().setData(PreferenceKey.BASE_PORT,"8045");
+                    sp.edit().putString("sport", "8045").commit();
+                }
 //                获取到的accessToken
             } catch (Exception e) {
                 e.printStackTrace();

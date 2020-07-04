@@ -52,15 +52,29 @@
         <Button
             android:id="@+id/open"
             android:text="开阀"
-            android:layout_width="100dp"
+            android:layout_width="70dp"
             android:layout_marginTop="50dp"
-            android:layout_marginLeft="100dp"
+            android:layout_marginLeft="10dp"
             android:layout_height="wrap_content"/>
         <Button
             android:id="@+id/close"
             android:text="关阀"
+            android:layout_width="70dp"
+            android:layout_marginLeft="90dp"
+            android:layout_marginTop="50dp"
+            android:layout_height="wrap_content"/>
+        <Button
+            android:id="@+id/f001"
+            android:text="地址设置"
             android:layout_width="100dp"
-            android:layout_marginLeft="200dp"
+            android:layout_marginLeft="170dp"
+            android:layout_marginTop="50dp"
+            android:layout_height="wrap_content"/>
+        <Button
+            android:id="@+id/f002"
+            android:text="出厂设置"
+            android:layout_width="100dp"
+            android:layout_marginLeft="280dp"
             android:layout_marginTop="50dp"
             android:layout_height="wrap_content"/>
 

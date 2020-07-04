@@ -1,52 +1,46 @@
 package com.mcz.temperarure_humidity_appproject.app;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.AssetFileDescriptor;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.AsyncTask;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.View;
-import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.RadioButton;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.alibaba.fastjson.JSONArray;
 import com.gyf.barlibrary.ImmersionBar;
-import com.mcz.temperarure_humidity_appproject.MainActivity;
 import com.mcz.temperarure_humidity_appproject.R;
 import com.mcz.temperarure_humidity_appproject.app.model.DataInfo;
-import com.mcz.temperarure_humidity_appproject.app.model.PullrefreshListviewAdapter;
 import com.mcz.temperarure_humidity_appproject.app.model.PullrefreshListviewAdapter2;
 import com.mcz.temperarure_humidity_appproject.app.ui.zxing.zxing.HTTPSCerUtils;
 import com.mcz.temperarure_humidity_appproject.app.ui.zxing.zxing.HttpUtil;
-import com.mcz.temperarure_humidity_appproject.app.utils.Config;
-import com.mcz.temperarure_humidity_appproject.app.utils.DataManager;
 import com.mcz.temperarure_humidity_appproject.app.view.view.IPullToRefresh;
 import com.mcz.temperarure_humidity_appproject.app.view.view.LoadingLayout;
 import com.mcz.temperarure_humidity_appproject.app.view.view.PullToRefreshBase;
 import com.mcz.temperarure_humidity_appproject.app.view.view.PullToRefreshFooter;
 import com.mcz.temperarure_humidity_appproject.app.view.view.PullToRefreshHeader;
 import com.mcz.temperarure_humidity_appproject.app.view.view.PullToRefreshListView;
-
-
-import org.json.JSONObject;
 
 import java.io.IOException;
 import java.text.DecimalFormat;
@@ -58,15 +52,13 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import okhttp3.Call;
-import okhttp3.Callback;
-import okhttp3.FormBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
-import okhttp3.RequestBody;
 import okhttp3.Response;
 
 public class HistoricaldataActivity extends AppCompatActivity {
 
+    private AlertDialog dialog;
     String deviceId = "";
     String gatewayId = "";
     String token2 = "";
@@ -88,6 +80,12 @@ public class HistoricaldataActivity extends AppCompatActivity {
 
     @BindView(R.id.close)
     Button closedoor;
+
+    @BindView(R.id.f001)
+    Button f001;
+
+    @BindView(R.id.f002)
+    Button f002;
 
     private View mNoMoreView2;
 
@@ -125,15 +123,108 @@ public class HistoricaldataActivity extends AppCompatActivity {
         opendoor.setOnClickListener(new View.OnClickListener() { //添加开阀指令
             @Override
             public void onClick(View v) {
-                handler.obtainMessage(0).sendToTarget();
+                AlertDialog.Builder alert=new AlertDialog.Builder(HistoricaldataActivity.this);
+                alert.setTitle("提醒");
+                alert.setMessage("您确定要添加开阀指令吗？");
+                alert.setPositiveButton("确定", new DialogInterface.OnClickListener(){
+
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        handler.obtainMessage(0).sendToTarget();
+                    }
+                });
+                alert.setNegativeButton("取消",null);
+                alert.show();
             }
         });
 
         closedoor.setOnClickListener(new View.OnClickListener() { //添加关阀指令
             @Override
             public void onClick(View v) {
-                handler.obtainMessage(1).sendToTarget();
+                AlertDialog.Builder alert=new AlertDialog.Builder(HistoricaldataActivity.this);
+                alert.setTitle("提醒");
+                alert.setMessage("您确定要添加关阀指令吗？");
+                alert.setPositiveButton("确定", new DialogInterface.OnClickListener(){
+
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        handler.obtainMessage(1).sendToTarget();
+                    }
+                });
+                alert.setNegativeButton("取消",null);
+                alert.show();
             }
+        });
+
+        f001.setOnClickListener(new View.OnClickListener() { //添加地址预设指令
+            @Override
+            public void onClick(View v) {
+                AlertDialog.Builder alert=new AlertDialog.Builder(HistoricaldataActivity.this);
+                alert.setTitle("提醒");
+                alert.setMessage("您确定要添加表地址预设指令吗？");
+                alert.setPositiveButton("确定", new DialogInterface.OnClickListener(){
+
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        handler.obtainMessage(2).sendToTarget();
+                    }
+                });
+                alert.setNegativeButton("取消",null);
+                alert.show();
+            }
+        });
+
+        f002.setOnClickListener(new View.OnClickListener() { //添加出厂设置指令
+            @Override
+            public void onClick(View v) {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(HistoricaldataActivity.this);
+                    //加载布局
+                    View contentView = View.inflate(HistoricaldataActivity.this, R.layout.dialog, null);
+                    //查找控件
+                    final EditText etjdtb = (EditText) contentView.findViewById(R.id.et_jdtb);
+                    final RadioButton open = (RadioButton) contentView.findViewById(R.id.btnOpen);
+                    final RadioButton close = (RadioButton) contentView.findViewById(R.id.btnClose);
+                    Button btnOk = (Button) contentView.findViewById(R.id.btn_ok);
+                    Button btnCancle = (Button) contentView.findViewById(R.id.btn_cancle);
+                    btnOk.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View arg0) {
+                            String jdtb = etjdtb.getText().toString();
+                            if (jdtb.equals("")) {
+                                Toast.makeText(HistoricaldataActivity.this, "请输入同步方量", Toast.LENGTH_SHORT).show();
+                            } else {
+                                String turnoff = "";
+                                if(open.isChecked()){
+                                    turnoff="01";
+                                }else{
+                                    turnoff="00";
+                                }
+                                Bundle bundle = new Bundle();
+                                bundle.putString("turnoff",turnoff);
+                                bundle.putString("jdtb",jdtb);
+                                Message message = Message.obtain();
+                                message.what=3;
+                                message.setData(bundle);
+                                handler.handleMessage(message);
+                                //关闭对话框
+                                dialog.dismiss();
+                            }
+                        }
+                    });
+                    btnCancle.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View arg0) {
+                            //关闭对话框
+                            dialog.dismiss();
+                        }
+                    });
+                    //设置内容
+                    builder.setView(contentView);
+                    //创建
+                    dialog = builder.create();
+                    //显示
+                    dialog.show();
+                }
         });
 
     }
@@ -214,7 +305,7 @@ public class HistoricaldataActivity extends AppCompatActivity {
 //                    + "&pageNo=" + Fnum + "&pageSize=" + Onum;
             ////////////////////////////////////////////************************查询设备历史数据*****************/////////////////////////////////////
             //String add_url = Config.all_url + "/iocm/app/data/v1.1.0/deviceDataHistory?deviceId=" + deviceId + "&gatewayId=" + gatewayId;
-            String json = hu.getHistory(qbbh);
+            String json = hu.getHistory(qbbh,sp2.getString("sport", ""));
             JSONArray joa = new JSONArray();
             joa = JSONArray.parseArray(json);
             Log.i("bbbbbbbbbbbbbbbbbbbbbbb", "josn1" + json);
@@ -249,11 +340,14 @@ public class HistoricaldataActivity extends AppCompatActivity {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-                dataInfo.setDevicetemperature(joa.getJSONObject(i).getString("qbll")+" m³");
+                dataInfo.setDevicetemperature(joa.getJSONObject(i).getString("qbll")+"");//m³
                 String scds = joa.getJSONObject(i).getString("scds");
                 Float dayll = Float.parseFloat(joa.getJSONObject(i).getString("qbll")) - Float.parseFloat(scds);
-                dataInfo.setDevicehumidity(decimalFormat.format(dayll)+" m³");
+                dataInfo.setDevicehumidity(decimalFormat.format(dayll)+"");//m³
                 dataInfo.setMessage(joa.getJSONObject(i).toString());
+                dataInfo.setBattery(joa.getJSONObject(i).getString("batteryVoltage"));
+                dataInfo.setSoftware(joa.getJSONObject(i).getString("software"));
+                dataInfo.setNetwork(joa.getJSONObject(i).getString("network"));
                 mlist2.add(dataInfo);
             }
         } catch (Exception e) {
@@ -494,15 +588,28 @@ public class HistoricaldataActivity extends AppCompatActivity {
                 case 1:
                     instructions="3052";
                     break;
+                case 2:
+                    instructions="F001";
+                    break;
+                case 3:
+                    instructions="F002";
+                    break;
             }
             if(instructions.equals("") || instructions == ""){
                 return;
             }
             OkHttpClient.Builder okHttpClient =new OkHttpClient.Builder();
             Request request = new Request.Builder()
-                    .url("https://222.180.163.205:8046/homay-nbiot-api/api/nbiot/datacollection/"+instructions+"/"+qbbh)
+                    .url("https://222.180.163.205:"+ sp2.getString("sport", "")+"/homay-nbiot-api/api/nbiot/datacollection/"+instructions+"/"+qbbh)
                     .get()
                     .build();
+            if(instructions.equals("F002")){
+                Bundle bundle = msg.getData();
+                request = new Request.Builder()
+                        .url("https://222.180.163.205:"+ sp2.getString("sport", "")+"/homay-nbiot-api/api/nbiot/datacollection/"+instructions+"/"+qbbh+"?turnOff="+bundle.getString("turnoff")+"&synchronize="+bundle.getString("jdtb"))
+                        .get()
+                        .build();
+            }
             HTTPSCerUtils.setTrustAllCertificate(okHttpClient);
             Call call = okHttpClient.build().newCall(request);
             final String finalInstructions = instructions;
@@ -525,6 +632,10 @@ public class HistoricaldataActivity extends AppCompatActivity {
                             Toast.makeText(HistoricaldataActivity.this,"开阀指令添加成功",Toast.LENGTH_LONG).show();
                         }else if(finalInstructions == "3052"){
                             Toast.makeText(HistoricaldataActivity.this,"关阀指令添加成功",Toast.LENGTH_LONG).show();
+                        }else if(finalInstructions == "F001"){
+                            Toast.makeText(HistoricaldataActivity.this,"表地址预设指令添加成功",Toast.LENGTH_LONG).show();
+                        }else if(finalInstructions == "F002"){
+                            Toast.makeText(HistoricaldataActivity.this,"表出厂设置指令添加成功",Toast.LENGTH_LONG).show();
                         }
                         Looper.loop();
 
@@ -550,5 +661,4 @@ public class HistoricaldataActivity extends AppCompatActivity {
             super.handleMessage(msg);
         }
     };
-
 }

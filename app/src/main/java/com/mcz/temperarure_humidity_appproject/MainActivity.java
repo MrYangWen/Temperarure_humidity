@@ -33,21 +33,18 @@ import com.alibaba.fastjson.JSONObject;
 import com.gyf.barlibrary.ImmersionBar;
 import com.mcz.temperarure_humidity_appproject.app.model.DataInfo;
 import com.mcz.temperarure_humidity_appproject.app.model.PullrefreshListviewAdapter;
-//import com.mcz.Temperarure_humidity_appproject.app.ui.activity.HistoryActivity;
 import com.mcz.temperarure_humidity_appproject.app.ui.activity.InputManualActivity;
 import com.mcz.temperarure_humidity_appproject.app.ui.zxing.zxing.HttpUtil;
 import com.mcz.temperarure_humidity_appproject.app.ui.zxing.zxing.new_CaptureActivity;
 import com.mcz.temperarure_humidity_appproject.app.utils.BDhelper;
 import com.mcz.temperarure_humidity_appproject.app.utils.Config;
 import com.mcz.temperarure_humidity_appproject.app.utils.DataManager;
-import com.mcz.temperarure_humidity_appproject.app.utils.NetDefult;
 import com.mcz.temperarure_humidity_appproject.app.view.view.IPullToRefresh;
 import com.mcz.temperarure_humidity_appproject.app.view.view.LoadingLayout;
 import com.mcz.temperarure_humidity_appproject.app.view.view.PullToRefreshBase;
 import com.mcz.temperarure_humidity_appproject.app.view.view.PullToRefreshFooter;
 import com.mcz.temperarure_humidity_appproject.app.view.view.PullToRefreshHeader;
 import com.mcz.temperarure_humidity_appproject.app.view.view.PullToRefreshListView;
-
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -56,6 +53,8 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+
+//import com.mcz.Temperarure_humidity_appproject.app.ui.activity.HistoryActivity;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -93,6 +92,7 @@ public class MainActivity extends AppCompatActivity {
     HttpUtil hu;
     Cursor cursor;
     ArrayList<String> bhs = new ArrayList<String>();
+    String port="8046";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -108,6 +108,8 @@ public class MainActivity extends AppCompatActivity {
         sp = PreferenceManager.getDefaultSharedPreferences(this);
         init();
         mListView = (PullToRefreshListView) findViewById(R.id.main_pull_refresh_lv);
+
+        port = sp.getString("sport", "");
         //this.deleteDatabase( "homaywater" );
         bd = new BDhelper( this,"homaywater");
         cursor = bd.getReadableDatabase().query("homaytable", null, null, null,null, null, null);
@@ -157,8 +159,9 @@ public class MainActivity extends AppCompatActivity {
                 if (!edtDvidSearch.getText().toString().trim().equals("")) {
                     refreshButtonClicked();
                 } else {
-                    new LoadDataAsyncTask(true, false).execute();//查询所有
-                    hintKbTwo();
+                    /*new LoadDataAsyncTask(true, false).execute();//查询所有
+                    hintKbTwo();*/
+
                 }
             }
         });
@@ -228,8 +231,9 @@ public class MainActivity extends AppCompatActivity {
         if(!qbbh.equals("")){
             try {
                 mlist = new ArrayList<DataInfo>();
-                String json = hu.getHistory(qbbh);
-                new HttpUtil().getHistory(qbbh);
+                String json = hu.getHistory1(qbbh,port);
+                Log.i("port", "port***********************" + port);
+                //new HttpUtil().getHistory(qbbh);
                 Thread.sleep(1000);
                 JSONArray jsonArray = new JSONArray();
                 jsonArray = JSONArray.parseArray(json);
@@ -275,7 +279,7 @@ public class MainActivity extends AppCompatActivity {
                             //dataInfo.setLasttime(info.getString("xcsj"));
                            // JSONObject object = new JSONObject(deviceinfo);
                             dataInfo.setDeviceName(info.getString("qbbh"));
-                            String add_url = Config.all_url + "/iocm/app/dm/v1.3.0/devices/" + info.getString("deviceId") + "?appId=" + login_appid;
+                            String add_url = Config.all_url + "/iocm/app/dm/v1.3.0/devices/" + info.getString("deviceId") + "?appId=" + login_appid+"";
                             String devid = DataManager.Txt_REQUSET(MainActivity.this, add_url, login_appid, token);
                             Log.i("bbbbbbbbbbbbbbbbbbbbbbb", "//////////////////////////////" + devid);
                             /*JSONArray devjson = new JSONArray();

@@ -3,7 +3,11 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/Temperarure_humidity.iml" filepath="$PROJECT_DIR$/Temperarure_humidity.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/Temperarure_humidity-app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/Temperarure_humidity-app.iml" group="Temperarure_humidity/app" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/library/Temperarure_humidity-library.iml" filepath="$PROJECT_DIR$/.idea/modules/library/Temperarure_humidity-library.iml" group="Temperarure_humidity/library" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/zxinglibrary/com.github.yuzhiqiang1993-zxinglibrary.iml" filepath="$PROJECT_DIR$/.idea/modules/zxinglibrary/com.github.yuzhiqiang1993-zxinglibrary.iml" group="Temperarure_humidity/zxinglibrary" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/git-Temperarure_humidity.iml" filepath="$PROJECT_DIR$/.idea/modules/git-Temperarure_humidity.iml" group="Temperarure_humidity" />
       <module fileurl="file://$PROJECT_DIR$/library/library.iml" filepath="$PROJECT_DIR$/library/library.iml" />
       <module fileurl="file://$PROJECT_DIR$/zxinglibrary/zxinglibrary.iml" filepath="$PROJECT_DIR$/zxinglibrary/zxinglibrary.iml" />
     </modules>

@@ -17,6 +17,33 @@ public class DataInfo implements Serializable{
     ////////////////////////////////
     private String lasttime;
     private String Devicetimestamp;
+    private String network;
+    private String software;
+    private String battery;
+
+    public String getBattery() {
+        return battery;
+    }
+
+    public void setBattery(String battery) {
+        this.battery = battery;
+    }
+
+    public String getNetwork() {
+        return network;
+    }
+
+    public void setNetwork(String network) {
+        this.network = network;
+    }
+
+    public String getSoftware() {
+        return software;
+    }
+
+    public void setSoftware(String software) {
+        this.software = software;
+    }
 
     public String getMessage() {
         return message;

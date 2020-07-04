@@ -22,5 +22,7 @@ public class PreferenceKey {
     public static final String RECEIVE_ORDER_PUSH = "RECEIVE_ORDER_PUSH";
     //服务器地址
     public static final String BASE_URL = "BASE_URL";
+    //服务器端口
+    public static final String BASE_PORT = "BASE_PORT";
 
 }

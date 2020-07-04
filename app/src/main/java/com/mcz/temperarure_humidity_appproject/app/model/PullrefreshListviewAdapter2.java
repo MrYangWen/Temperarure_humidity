@@ -9,7 +9,6 @@ import android.widget.TextView;
 
 import com.mcz.temperarure_humidity_appproject.R;
 
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -84,6 +83,10 @@ public class PullrefreshListviewAdapter2 extends BaseAdapter {
             vh.temperature = (TextView) convertView.findViewById(R.id.temperature);
             vh.timestamp = (TextView) convertView.findViewById(R.id.timestamp);
             vh.humidity = (TextView) convertView.findViewById(R.id.humidity);
+            vh.network = (TextView) convertView.findViewById(R.id.network);
+            vh.software = (TextView) convertView.findViewById(R.id.software);
+            vh.battery = (TextView) convertView.findViewById(R.id.battery);
+
             convertView.setTag(vh);
         } else {
             vh = (ViewHolder) convertView.getTag();
@@ -96,6 +99,9 @@ public class PullrefreshListviewAdapter2 extends BaseAdapter {
         vh.humidity.setText(info.getDevicehumidity());
         vh.temperature.setText(info.getDevicetemperature());//
         vh.timestamp.setText(time);
+        vh.network.setText(info.getNetwork());
+        vh.software.setText(info.getSoftware());
+        vh.battery.setText(info.getBattery());
         return convertView;
     }
 
@@ -103,5 +109,8 @@ public class PullrefreshListviewAdapter2 extends BaseAdapter {
         TextView temperature;
         TextView timestamp;
         TextView humidity;
+        TextView network;
+        TextView software;
+        TextView battery;
     }
 }
