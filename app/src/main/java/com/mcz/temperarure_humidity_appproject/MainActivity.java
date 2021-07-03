@@ -2,6 +2,7 @@ package com.mcz.temperarure_humidity_appproject;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -15,15 +16,18 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.text.format.DateFormat;
 import android.util.Log;
+import android.util.Xml;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -44,6 +48,9 @@ import com.mcz.temperarure_humidity_appproject.app.ui.zxing.zxing.new_CaptureAct
 import com.mcz.temperarure_humidity_appproject.app.utils.BDhelper;
 import com.mcz.temperarure_humidity_appproject.app.utils.Config;
 import com.mcz.temperarure_humidity_appproject.app.utils.DataManager;
+import com.mcz.temperarure_humidity_appproject.app.utils.NetDefult;
+import com.mcz.temperarure_humidity_appproject.app.utils.PreHelper;
+import com.mcz.temperarure_humidity_appproject.app.utils.PreferenceKey;
 import com.mcz.temperarure_humidity_appproject.app.view.view.IPullToRefresh;
 import com.mcz.temperarure_humidity_appproject.app.view.view.LoadingLayout;
 import com.mcz.temperarure_humidity_appproject.app.view.view.PullToRefreshBase;
@@ -86,6 +93,9 @@ public class MainActivity extends AppCompatActivity {
 
     @BindView(R.id.main_relative)
     RelativeLayout rela_nodata;
+
+    @BindView(R.id.addqb)
+    Button addqb;
 
     private View mNoMoreView;
     private String login_appid;
@@ -139,6 +149,48 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void init() {
+        addqb.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                builder.setTitle("请输入表号");    //设置对话框标题
+                builder.setIcon(android.R.drawable.btn_star);   //设置对话框标题前的图标
+                final EditText edit = new EditText(context);
+                builder.setView(edit);
+                builder.setPositiveButton("确认", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        String qbbh = edit.getText().toString();
+                        if(qbbh.length()!=14){
+                            Toast.makeText(context, "请输入14位表号", Toast.LENGTH_SHORT).show();
+                        }else {
+                            String old = NetDefult.getInstance().getqbbhs(MainActivity.this);
+                            Log.i("test", "qbbhs:" + old);
+                            String[] olds = old.split(",");
+                            for (String s : olds) {
+                                if(qbbh.equals(s)){
+                                    Toast.makeText(context, "表号已存在", Toast.LENGTH_SHORT).show();
+                                    return;
+                                }
+                            }
+                            PreHelper.defaultCenter1(MainActivity.this).setData(PreferenceKey.qbbhs,old+qbbh+",");
+                            Toast.makeText(context, "添加成功", Toast.LENGTH_SHORT).show();
+                            refreshButtonClicked();
+                        }
+                    }
+                });
+                builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                    }
+                });
+                builder.setCancelable(true);    //设置按钮是否可以按返回键取消,false则不可以取消
+                AlertDialog dialog = builder.create();  //创建对话框
+                dialog.setCanceledOnTouchOutside(false); //设置弹出框失去焦点是否隐藏,即点击屏蔽其它地方是否隐藏
+                dialog.show();
+            }
+        });
         login_appid = sp.getString("appId", "");
         token = sp.getString("token", "");
         hintKbTwo();
@@ -241,81 +293,59 @@ public class MainActivity extends AppCompatActivity {
      */
     private List<DataInfo> ListviewADD_Data(int Fnum, int Onum) {
         String qbbh = edtDvidSearch.getText().toString().trim();
+        mlist = new ArrayList<DataInfo>();
         if(!qbbh.equals("")){
             try {
-                mlist = new ArrayList<DataInfo>();
-                String json = hu.getHistory1(qbbh,port);
-                Log.i("port", "port***********************" + port);
-                //new HttpUtil().getHistory(qbbh);
+                String json = hu.getHistory1(qbbh,"8560");
                 Thread.sleep(1000);
-                JSONArray jsonArray = new JSONArray();
-                jsonArray = JSONArray.parseArray(json);
                 Log.i("bbbbbbbbbbbbbbbbbbbbbbb", "test***********************" + json);
-
-                /*String add_url = Config.all_url + "/iocm/app/dm/v1.3.0/devices?appId=" + login_appid
-                        + "&pageNo=" + Fnum + "&pageSize=" + Onum;
-                //String add_url = Config.all_url + "/iocm/app/dm/v1.3.0/devices/" + "d8811b05-5fbe-4d55-8041-21a0f11fe7b7" + "?appId=" + login_appid;
-                String json = DataManager.Txt_REQUSET(MainActivity.this, add_url, login_appid, token);
-                mlist = new ArrayList<DataInfo>();
-
-                JSONObject jo = new JSONObject(json);
-                JSONArray jsonArray = jo.getJSONArray("devices");
-                Log.e("test", "" + jsonArray);*/
-                //for (int i = 0; i < jsonArray.length(); i++) {
-                    DataInfo dataInfo = new DataInfo();
-                JSONObject info = new JSONObject();
-                info = jsonArray.getJSONObject(0);
-                    /*String deviceinfo = jsonArray.getJSONObject(0);
-                    JSONObject object1 = new JSONObject(deviceinfo);
-                    String bh = object1.optString("name").substring(0, 14);*/
-                        /*if (false) {
-                            JSONArray jsa = new JSONArray(deviceinfo);
-                            for (int j = 0; j < jsa.length(); j++) {
-                                String ser_data = jsa.getJSONObject(j).getString("data");
-                                JSONObject jsonObject = new JSONObject(ser_data);
-                                dataInfo.setDevicehumidity(jsonObject.optString("M2s"));
-                                dataInfo.setDevicehumidity(jsonObject.optString("S2m"));
-                            }
-                            dataInfo.setDeviceId(jsonArray.getJSONObject(i).optString("deviceId"));
-                            dataInfo.setGatewayId(jsonArray.getJSONObject(i).optString("gatewayId"));
-                            dataInfo.setLasttime(jsonArray.getJSONObject(i).optString("lastModifiedTime"));
-                            JSONObject object = new JSONObject(deviceinfo);
-                            dataInfo.setDeviceName(object.optString("name"));
-                            dataInfo.setDeviceStatus(object.optString("status"));
-                            dataInfo.setDevicetemperature("0.00");
-                            dataInfo.setDevicehumidity("0.00");
-                            mlist.add(dataInfo);
-                        } // 获取指定表的抄表量
-                        else{*/
-                            dataInfo.setDeviceId(info.getString("deviceId"));
-                           // dataInfo.setGatewayId(jsonArray.getJSONObject(i).optString("gatewayId"));
-                            //dataInfo.setLasttime(info.getString("xcsj"));
-                           // JSONObject object = new JSONObject(deviceinfo);
-                            dataInfo.setDeviceName(info.getString("qbbh"));
-                            String add_url = Config.all_url + "/iocm/app/dm/v1.3.0/devices/" + info.getString("deviceId") + "?appId=" + login_appid+"";
-                            String devid = DataManager.Txt_REQUSET(MainActivity.this, add_url, login_appid, token);
-                            Log.i("bbbbbbbbbbbbbbbbbbbbbbb", "//////////////////////////////" + devid);
-                            /*JSONArray devjson = new JSONArray();
-                            devjson = JSONArray.parseArray(devid);*/
-                            org.json.JSONObject jo = new org.json.JSONObject(devid);
-                            String deviceinfo = jo.optString("deviceInfo");
-                            dataInfo.setLasttime(jo.optString("lastModifiedTime"));
-                            org.json.JSONObject object = new org.json.JSONObject(deviceinfo);
-
-                            dataInfo.setDeviceStatus(object.optString("status"));
-                       /* String json1 = "";
-                        JSONObject jo1 = new JSONObject();
-                        String add_url1 = "https://222.180.163.205:8045/homay-nbiot-api/api/nbiot/datacollection/list?protocolCode=" + bh;
-                        HttpUtil hu = new HttpUtil();
-                        json1 = hu.getHistory(bh);
-                        jo1 = new JSONObject(json1);*/
-                            dataInfo.setDevicetemperature(info.getString("qbll"));
-                            dataInfo.setDevicehumidity(info.getString("freeQbll"));
-                            mlist.add(dataInfo);
-                        //}
-                //}
+                DataInfo dataInfo = new DataInfo();
+                org.json.JSONObject info = new org.json.JSONObject(json);
+                dataInfo.setDeviceId(info.getString("deviceId"));
+                dataInfo.setDeviceName(info.getString("qbbh"));
+                String add_url = Config.all_url + "/iocm/app/dm/v1.3.0/devices/" + info.getString("deviceId") + "?appId=" + login_appid+"";
+                String devid = DataManager.Txt_REQUSET(MainActivity.this, add_url, login_appid, token);
+                Log.i("bbbbbbbbbbbbbbbbbbbbbbb", "//////////////////////////////" + devid);
+                org.json.JSONObject jo = new org.json.JSONObject(devid);
+                String deviceinfo = jo.optString("deviceInfo");
+                dataInfo.setLasttime(jo.optString("lastModifiedTime"));
+                org.json.JSONObject object = new org.json.JSONObject(deviceinfo);
+                dataInfo.setDeviceStatus(object.optString("status"));
+                dataInfo.setDevicetemperature(info.getString("qbll"));
+                dataInfo.setDevicehumidity(info.getString("freeQbll"));
+                mlist.add(dataInfo);
             } catch (Exception e) {
                 e.printStackTrace();
+            }
+        }else {
+            String qbbhs = NetDefult.getInstance().getqbbhs(MainActivity.this);
+            Log.i("test", "qbbhs:" + qbbhs);
+            if(!qbbhs.equals("")){
+                String[] qbs = qbbhs.split(",");
+                for (String qb : qbs) {
+                    try {
+                        String json = hu.getHistory1(qb,"8560");
+                        Thread.sleep(500);
+                        Log.i("bbbbbbbbbbbbbbbbbbbbbbb", "test***********************" + json);
+                        DataInfo dataInfo = new DataInfo();
+                        org.json.JSONObject info = new org.json.JSONObject(json);
+                        dataInfo.setDeviceId(info.getString("deviceId"));
+                        dataInfo.setDeviceName(info.getString("qbbh"));
+                        String add_url = Config.all_url + "/iocm/app/dm/v1.3.0/devices/" + info.getString("deviceId") + "?appId=" + login_appid+"";
+                        String devid = DataManager.Txt_REQUSET(MainActivity.this, add_url, login_appid, token);
+                        Log.i("bbbbbbbbbbbbbbbbbbbbbbb", "//////////////////////////////" + devid);
+                        org.json.JSONObject jo = new org.json.JSONObject(devid);
+                        String deviceinfo = jo.optString("deviceInfo");
+                        dataInfo.setLasttime(jo.optString("lastModifiedTime"));
+                        org.json.JSONObject object = new org.json.JSONObject(deviceinfo);
+                        dataInfo.setDeviceStatus(object.optString("status"));
+                        dataInfo.setDevicetemperature(info.getString("qbll"));
+                        dataInfo.setDevicehumidity(info.getString("freeQbll"));
+                        mlist.add(dataInfo);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
             }
         }
         return mlist;
@@ -378,57 +408,6 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
-
-
-    /*private List<DataInfo> Listview_Inputmanual(String dvid) {
-        try {
-            // https://server:port/iocm/app/dm/v1.3.0/devices/{deviceId}?appId={appId}
-            String login_appid = sp.getString("appId", "");
-            String add_url = Config.all_url + "/iocm/app/dm/v1.3.0/devices/" + dvid + "?appId=" + login_appid;
-            String json = DataManager.Txt_REQUSET(MainActivity.this, add_url, login_appid, token);
-            Log.i("aaa", "josn1" + json);
-            mlist = new ArrayList<DataInfo>();
-            JSONObject jo = new JSONObject(json);
-            String code_error = jo.optString("error_code");
-            if (!code_error.equals("")) {
-                // DataInfo dataInfo = new DataInfo();
-                // dataInfo.setError_code(code_error);
-                // mlist.add(dataInfo);
-                return null;
-            } else {
-                DataInfo dataInfo = new DataInfo();
-                // JSONArray jsonArray = jo.getJSONArray("devices");
-                String deviceinfo = jo.optString("deviceInfo");
-                dataInfo.setDeviceId(jo.optString("deviceId"));
-                dataInfo.setLasttime(jo.optString("lastModifiedTime"));
-                JSONObject object = new JSONObject(deviceinfo);
-                dataInfo.setDeviceName(object.optString("name"));
-                // dataInfo.setDeviceType(object.optString("deviceType"));//model  deviceType
-                dataInfo.setDeviceStatus(object.optString("status"));
-                String servicesinfo = jo.optString("services");
-                if (!servicesinfo.equals("null")) {
-                    JSONArray jsa = new JSONArray(servicesinfo);
-                    for (int j = 0; j < jsa.length(); j++) {
-                        String ser_data = jsa.getJSONObject(j).getString("data");
-                        JSONObject jsonObject = new JSONObject(ser_data);
-                        // 和profile文件一样
-                        dataInfo.setDevicetemperature(jsonObject.optString("M2s"));
-                        dataInfo.setDevicehumidity(jsonObject.optString("S2m"));
-                    }
-                    mlist.add(dataInfo);
-                } else {
-                    dataInfo.setDevicetemperature("暂无数据");
-                    dataInfo.setDevicehumidity("暂无数据");
-                }
-            }
-        } catch (Exception e) {
-            Toast.makeText(this, "请输入正确的设备ID", Toast.LENGTH_SHORT).show();
-            //rela_nodata.setVisibility(View.VISIBLE);
-            e.printStackTrace();
-        }
-        return mlist;
-    }*/
-
     public void setBackgroundAlpha(float bgAlpha) {
         WindowManager.LayoutParams lp = getWindow()
                 .getAttributes();

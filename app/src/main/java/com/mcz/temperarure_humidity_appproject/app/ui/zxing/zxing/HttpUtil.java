@@ -77,19 +77,11 @@ public class HttpUtil {
                         .build();
 
                 Request request = new Request.Builder()
-                        .url("https://222.180.163.205:"+ port+"/homay-nbiot-api/api/nbiot/datacollection/list1/"+qbbh)
+                        .url("http://222.180.162.247:"+port+"/gas-nbiot-api/api/nbiot/datacollection/historyList/"+qbbh)
                         .post(requestBody)
                         .build();
                 Log.i("request.url","------------:"+request.url());
                 HTTPSCerUtils.setTrustAllCertificate(okHttpClient);
-                /*Response  response= null;
-                try {
-                    response = okHttpClient.build().newCall(request).execute();
-                    result[0] = response.body().string();
-
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }*/
                 Call call = okHttpClient.build().newCall(request);
                 call.enqueue(new Callback() {
 
@@ -110,36 +102,6 @@ public class HttpUtil {
         Thread.sleep(2000);
         Log.e("test","*******************************************"+result[0]);
         return result[0];
-                /*OkHttpClient.Builder okHttpClient =new OkHttpClient.Builder();
-
-                RequestBody requestBody=new FormBody.Builder()
-                        .add("protocolCode",qbbh)
-                        .build();
-
-                Request request = new Request.Builder()
-                        .url("https://222.180.163.205:8045/homay-nbiot-api/api/nbiot/datacollection/list")
-                        .post(requestBody)
-                        .build();
-                HTTPSCerUtils.setTrustAllCertificate(okHttpClient);
-                Response  response=  okHttpClient.build().newCall(request).execute();
-                String strBody =     response.body().string();*/
-
-                /*Call call = okHttpClient.build().newCall(request);
-                call.enqueue(new Callback() {
-
-                    @Override
-                    public void onFailure(Call call, IOException e) {
-                        Log.i("test","------------:"+e.toString());
-                    }
-
-                    @Override
-                    public void onResponse(Call call, Response response) throws IOException {
-                        //Log.i("test","------------:"+response.body().string());
-                        result[0] = response.body().string();
-                    }
-                });*/
-        //Thread.sleep(500);
-        //Log.i("test","*********************:"+ result[0]);
     }
     public String getHistory1(final String qbbh, final String port) throws IOException, InterruptedException {
 
@@ -154,7 +116,7 @@ public class HttpUtil {
                         .build();
 
                 Request request = new Request.Builder()
-                        .url("https://222.180.163.205:"+port+"/homay-nbiot-api/api/nbiot/datacollection/list/"+qbbh)
+                        .url("http://222.180.162.247:"+port+"/gas-nbiot-api/api/nbiot/datacollection/list/"+qbbh)
                         .post(requestBody)
                         .build();
                 Log.i("request.url","------------:"+request.url());
@@ -184,38 +146,8 @@ public class HttpUtil {
                 });
             }
         }).start();
-        Thread.sleep(2000);
+        Thread.sleep(500);
         Log.e("test","*******************************************"+result[0]);
         return result[0];
-                /*OkHttpClient.Builder okHttpClient =new OkHttpClient.Builder();
-
-                RequestBody requestBody=new FormBody.Builder()
-                        .add("protocolCode",qbbh)
-                        .build();
-
-                Request request = new Request.Builder()
-                        .url("https://222.180.163.205:8045/homay-nbiot-api/api/nbiot/datacollection/list")
-                        .post(requestBody)
-                        .build();
-                HTTPSCerUtils.setTrustAllCertificate(okHttpClient);
-                Response  response=  okHttpClient.build().newCall(request).execute();
-                String strBody =     response.body().string();*/
-
-                /*Call call = okHttpClient.build().newCall(request);
-                call.enqueue(new Callback() {
-
-                    @Override
-                    public void onFailure(Call call, IOException e) {
-                        Log.i("test","------------:"+e.toString());
-                    }
-
-                    @Override
-                    public void onResponse(Call call, Response response) throws IOException {
-                        //Log.i("test","------------:"+response.body().string());
-                        result[0] = response.body().string();
-                    }
-                });*/
-        //Thread.sleep(500);
-        //Log.i("test","*********************:"+ result[0]);
     }
 }

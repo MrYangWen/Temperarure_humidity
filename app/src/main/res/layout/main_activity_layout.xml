@@ -61,12 +61,15 @@
                 android:id="@+id/edt_dvid_search"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentTop="true"
+                android:layout_marginStart="0dp"
+                android:layout_marginTop="5dp"
                 android:background="@drawable/img_search_edt_bg"
                 android:hint="根据ID搜索设备"
                 android:imeOptions="actionSearch"
                 android:inputType="text"
-                android:paddingLeft="18px"
+                android:paddingLeft="10px"
                 android:textColor="#000000"
                 android:textSize="15sp">
 
@@ -78,7 +81,7 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
                 android:layout_centerVertical="true"
-                android:paddingRight="10dp">
+                android:paddingRight="5dp">
 
                 <ImageView
                     android:id="@+id/search_delete"
@@ -100,10 +103,18 @@
                 android:id="@+id/img_srearch"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
                 android:background="@drawable/change_search_bg_item"
                 android:clickable="true" />
 
         </RelativeLayout>
+
+        <Button
+            android:id="@+id/addqb"
+            android:layout_width="50dp"
+            android:layout_height="match_parent"
+            android:text="＋" />
 
     </LinearLayout>
 

@@ -25,4 +25,6 @@ public class PreferenceKey {
     //服务器端口
     public static final String BASE_PORT = "BASE_PORT";
 
+    public static final String qbbhs = ",";
+
 }

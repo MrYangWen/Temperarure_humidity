@@ -75,7 +75,7 @@ public class HistoricaldataActivity extends AppCompatActivity {
     @BindView(R.id.img_histor)
     ImageView back;
 
-    @BindView(R.id.open)
+    /*@BindView(R.id.open)
     Button opendoor;
 
     @BindView(R.id.close)
@@ -85,7 +85,7 @@ public class HistoricaldataActivity extends AppCompatActivity {
     Button f001;
 
     @BindView(R.id.f002)
-    Button f002;
+    Button f002;*/
 
     private View mNoMoreView2;
 
@@ -120,7 +120,7 @@ public class HistoricaldataActivity extends AppCompatActivity {
             }
         });
 
-        opendoor.setOnClickListener(new View.OnClickListener() { //添加开阀指令
+        /*opendoor.setOnClickListener(new View.OnClickListener() { //添加开阀指令
             @Override
             public void onClick(View v) {
                 AlertDialog.Builder alert=new AlertDialog.Builder(HistoricaldataActivity.this);
@@ -136,9 +136,9 @@ public class HistoricaldataActivity extends AppCompatActivity {
                 alert.setNegativeButton("取消",null);
                 alert.show();
             }
-        });
+        });*/
 
-        closedoor.setOnClickListener(new View.OnClickListener() { //添加关阀指令
+        /*closedoor.setOnClickListener(new View.OnClickListener() { //添加关阀指令
             @Override
             public void onClick(View v) {
                 AlertDialog.Builder alert=new AlertDialog.Builder(HistoricaldataActivity.this);
@@ -154,9 +154,9 @@ public class HistoricaldataActivity extends AppCompatActivity {
                 alert.setNegativeButton("取消",null);
                 alert.show();
             }
-        });
+        });*/
 
-        f001.setOnClickListener(new View.OnClickListener() { //添加地址预设指令
+        /*f001.setOnClickListener(new View.OnClickListener() { //添加地址预设指令
             @Override
             public void onClick(View v) {
                 AlertDialog.Builder alert=new AlertDialog.Builder(HistoricaldataActivity.this);
@@ -172,9 +172,9 @@ public class HistoricaldataActivity extends AppCompatActivity {
                 alert.setNegativeButton("取消",null);
                 alert.show();
             }
-        });
+        });*/
 
-        f002.setOnClickListener(new View.OnClickListener() { //添加出厂设置指令
+        /*f002.setOnClickListener(new View.OnClickListener() { //添加出厂设置指令
             @Override
             public void onClick(View v) {
                     AlertDialog.Builder builder = new AlertDialog.Builder(HistoricaldataActivity.this);
@@ -225,7 +225,7 @@ public class HistoricaldataActivity extends AppCompatActivity {
                     //显示
                     dialog.show();
                 }
-        });
+        });*/
 
     }
 
@@ -305,7 +305,7 @@ public class HistoricaldataActivity extends AppCompatActivity {
 //                    + "&pageNo=" + Fnum + "&pageSize=" + Onum;
             ////////////////////////////////////////////************************查询设备历史数据*****************/////////////////////////////////////
             //String add_url = Config.all_url + "/iocm/app/data/v1.1.0/deviceDataHistory?deviceId=" + deviceId + "&gatewayId=" + gatewayId;
-            String json = hu.getHistory(qbbh,sp2.getString("sport", ""));
+            String json = hu.getHistory(qbbh,"8560");
             JSONArray joa = new JSONArray();
             joa = JSONArray.parseArray(json);
             Log.i("bbbbbbbbbbbbbbbbbbbbbbb", "josn1" + json);
@@ -317,7 +317,8 @@ public class HistoricaldataActivity extends AppCompatActivity {
             for (int i = 0; i < joa.size(); i++) {
                 DataInfo dataInfo = new DataInfo();
 
-                String time =  sdf.format(new Date(Long.valueOf(joa.getJSONObject(i).getString("xcsj"))));
+                String t = joa.getJSONObject(i).getString("xcsj");
+                String time =  t.substring(0,t.length()-2);
                 String timestamp = time;
                 dataInfo.setDevicetimestamp(timestamp);
                 //String ser_data = joa.getJSONObject(i).getString("data");

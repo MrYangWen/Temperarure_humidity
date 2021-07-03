@@ -14,8 +14,8 @@ public class NetDefult {
 
     private static final String IP = "device.api.ct10649.com"; //IP
     private static final String PORT = "8743";                  //端口
-    private static final String APPID = "0kjvV5MCmsvxdJsuKey8zfxOYT0a"; //APPID
-    private static final String APPPWD = "YH9wZbbErSmefcNFgiBDon43gfca";//APP密钥
+    private static final String APPID = "8xXtFhEiUnLWDFwu3QasgpnWaFAa"; //APPID
+    private static final String APPPWD = "_vEzC45KWxTbLpC3ZJEbbFMu0pga";//APP密钥
     private static final String meter = "";
 
     private static final String IP8045 = "develop.api.ct10649.com"; //IP
@@ -59,8 +59,12 @@ public class NetDefult {
         cursor.close();bd.close();
         return res;
     }
-    public String getServerPort(){
-        String serverPort = PreHelper.defaultCenter().getStringData(PreferenceKey.BASE_PORT);
+    public String getServerPort(Context context){
+        String serverPort = PreHelper.defaultCenter1(context).getStringData(PreferenceKey.BASE_PORT);
         return serverPort;
+    }
+    public static String getqbbhs(Context context){
+        String qbbhs = PreHelper.defaultCenter1(context).getStringData(PreferenceKey.qbbhs);
+        return qbbhs;
     }
 }

@@ -33,7 +33,6 @@
         <activity android:name="com.mcz.temperarure_humidity_appproject.app.ui.activity.InputCodeActivity" />
         <activity android:name="com.mcz.temperarure_humidity_appproject.app.HistoricaldataActivity"/>
         <activity android:name="com.mcz.temperarure_humidity_appproject.app.ui.zxing.zxing.new_CaptureActivity"/>
-
     </application>
 
 </manifest>

@@ -19,12 +19,24 @@ public class PreHelper {
         }
         return single;
     }
+    public static PreHelper defaultCenter1(Context context) {
+        synchronized (PreHelper.class) {
+            if (single == null) {
+                single = new PreHelper(context);
+            }
+        }
+        return single;
+    }
 
     SharedPreferences preference = null;
 
     public PreHelper() {
         XApplication xplt = new XApplication();
         preference = xplt.getInstance().getApplicationContext().getSharedPreferences("SharedPreferences", Context.MODE_PRIVATE);
+    }
+
+    public PreHelper(Context context) {
+        preference =context.getSharedPreferences("SharedPreferences", Context.MODE_PRIVATE);
     }
 
 
