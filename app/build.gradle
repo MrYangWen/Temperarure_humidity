@@ -60,4 +60,8 @@ dependencies {
     //compile project(':hellocharts-library')
     implementation project(path: ':library')
     implementation project(path: ':zxinglibrary')
-}
+    //implementation 'com.journeyapps:zxing-android-embedded:3.5.0'
+    /*compile  ('com.journeyapps:zxing-android-embedded:3.6.0') {
+            exclude group: 'com.android.support'
+        }*/
+    }

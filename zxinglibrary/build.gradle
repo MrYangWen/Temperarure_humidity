@@ -4,7 +4,7 @@ apply plugin: 'com.android.library'
 group = 'com.github.yuzhiqiang1993'
 
 android {
-    compileSdkVersion 22
+    compileSdkVersion 28
     buildToolsVersion '28.0.3'
 
 
@@ -27,6 +27,7 @@ dependencies {
     implementation 'com.android.support:design:25.4.0'
     implementation 'com.android.support:support-v4:25.4.0'
     implementation 'com.android.support:support-vector-drawable:25.4.0'
+    implementation project(path: ':library')
 }
 
 //// 指定编码

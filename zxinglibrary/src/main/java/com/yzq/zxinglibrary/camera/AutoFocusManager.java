@@ -39,7 +39,7 @@ final class AutoFocusManager implements Camera.AutoFocusCallback {
 
     static {
         FOCUS_MODES_CALLING_AF = new ArrayList<String>(2);
-        FOCUS_MODES_CALLING_AF.add(Camera.Parameters.FOCUS_MODE_AUTO);
+        FOCUS_MODES_CALLING_AF.add(Camera.Parameters.FOCUS_MODE_CONTINUOUS_VIDEO);
         FOCUS_MODES_CALLING_AF.add(Camera.Parameters.FOCUS_MODE_MACRO);
     }
 

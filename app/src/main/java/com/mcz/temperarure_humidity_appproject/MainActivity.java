@@ -1,8 +1,10 @@
 package com.mcz.temperarure_humidity_appproject;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.content.res.AssetFileDescriptor;
 import android.database.Cursor;
 import android.graphics.drawable.BitmapDrawable;
@@ -11,6 +13,8 @@ import android.media.MediaPlayer;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.text.format.DateFormat;
 import android.util.Log;
@@ -30,6 +34,7 @@ import android.widget.Toast;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+
 import com.gyf.barlibrary.ImmersionBar;
 import com.mcz.temperarure_humidity_appproject.app.model.DataInfo;
 import com.mcz.temperarure_humidity_appproject.app.model.PullrefreshListviewAdapter;
@@ -45,6 +50,7 @@ import com.mcz.temperarure_humidity_appproject.app.view.view.PullToRefreshBase;
 import com.mcz.temperarure_humidity_appproject.app.view.view.PullToRefreshFooter;
 import com.mcz.temperarure_humidity_appproject.app.view.view.PullToRefreshHeader;
 import com.mcz.temperarure_humidity_appproject.app.view.view.PullToRefreshListView;
+import com.yzq.zxinglibrary.android.CaptureActivity;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -161,7 +167,14 @@ public class MainActivity extends AppCompatActivity {
                 } else {
                     /*new LoadDataAsyncTask(true, false).execute();//查询所有
                     hintKbTwo();*/
-
+                    if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.CAMERA)
+                            != PackageManager.PERMISSION_GRANTED) {
+                        //申请WRITE_EXTERNAL_STORAGE权限
+                        ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.CAMERA},
+                                1);}
+                    Intent intent = new Intent(MainActivity.this, CaptureActivity.class);//黄色是第三方类库里面的类
+                    startActivityForResult(intent,0);
+                    mListView.onRefreshComplete();
                 }
             }
         });
@@ -354,6 +367,16 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
         super.onActivityResult(requestCode, resultCode, intent);
+        if(resultCode==RESULT_OK){
+            String s = intent.getStringExtra("codedContent");//这个绿色的result是在第三方类库里面定义的key
+            Log.i("test","扫描结果"+s);
+            if(s.length()==14){
+                edtDvidSearch.setText(s);
+                edtDvidSearch.performClick();
+            }else{
+                Toast.makeText(MainActivity.this, "请扫描表上条形码", Toast.LENGTH_SHORT).show();
+            }
+        }
     }
 
 
@@ -639,7 +662,7 @@ public class MainActivity extends AppCompatActivity {
                 adapter.notifyDataSetChanged();//刷新完成
             } else {
                 //rela_nodata.setVisibility(View.VISIBLE);
-                Toast.makeText(MainActivity.this, "暂无设备信息", Toast.LENGTH_SHORT).show();
+                Toast.makeText(MainActivity.this, "暂无设备信息2", Toast.LENGTH_SHORT).show();
             }
         }
     }
