@@ -4,7 +4,7 @@ android {
     compileSdkVersion 28
     buildToolsVersion '28.0.3'
     defaultConfig {
-        applicationId "com.mcz.Temperarure_humidity_appproject"
+        applicationId "com.mcz.semay"
         minSdkVersion 22
         targetSdkVersion 28
         versionCode 1
